@@ -5,19 +5,18 @@ const path = require('path');
 const dbConfig = {
   // SQLite configuratie voor lokale ontwikkeling
   database: path.join(__dirname, '../data/orders.db'),
-  // MySQL configuratie voor productie (Vercel)
-  mysql: {
-    connectionLimit: 10,
+  // PostgreSQL configuratie voor productie (Neon)
+  postgres: {
     host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'order_tool',
-    port: process.env.DB_PORT || 3306,
-    timezone: 'Z',
+    port: process.env.DB_PORT || 5432,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     // Vercel serverless specific settings
-    acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true
+    connectionTimeoutMillis: 60000,
+    idleTimeoutMillis: 60000,
+    max: 10
   }
 };
 
