@@ -57,7 +57,7 @@ function initDatabase() {
           reject(err);
           return;
         }
-        console.log('Orders tabel aangemaakt of al bestaand');
+        console.log('Orders tabel aangemaakt/gecontroleerd');
 
         // Create users table
         db.run(createUsersTableQuery, (err) => {
@@ -66,32 +66,33 @@ function initDatabase() {
             reject(err);
             return;
           }
-          console.log('Users tabel aangemaakt of al bestaand');
+          console.log('Users tabel aangemaakt/gecontroleerd');
 
-          // Check if admin user exists, if not create one
+          // Check if default user exists
           db.get('SELECT * FROM users WHERE username = ?', ['admin'], (err, user) => {
             if (err) {
-              console.error('Fout bij controleren admin gebruiker:', err);
+              console.error('Fout bij controleren default user:', err);
               reject(err);
               return;
             }
 
             if (!user) {
+              // Create default user
               const bcrypt = require('bcryptjs');
               const hashedPassword = bcrypt.hashSync('admin123', 10);
               
               db.run('INSERT INTO users (username, password) VALUES (?, ?)', 
                 ['admin', hashedPassword], (err) => {
                 if (err) {
-                  console.error('Fout bij aanmaken admin gebruiker:', err);
+                  console.error('Fout bij aanmaken default user:', err);
                   reject(err);
                   return;
                 }
-                console.log('Admin gebruiker aangemaakt (username: admin, password: admin123)');
+                console.log('Default user aangemaakt (admin/admin123)');
                 resolve();
               });
             } else {
-              console.log('Admin gebruiker bestaat al');
+              console.log('Default user bestaat al');
               resolve();
             }
           });
