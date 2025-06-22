@@ -30,39 +30,31 @@ if (process.env.NODE_ENV !== 'production') {
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 
-// Serve static files from React app in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  });
-}
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Catch all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
 const PORT = process.env.PORT || 3001;
 
 // Initialize database and start server
-async function startServer() {
-  try {
-    await initDatabase();
-    console.log('Database geïnitialiseerd');
-    
-    app.listen(PORT, () => {
-      console.log(`Server draait op poort ${PORT}`);
-      console.log(`Omgeving: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`Beschikbaar op: http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('Fout bij starten server:', error);
-    process.exit(1);
-  }
-}
-
-startServer();
+initDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server draait op poort ${PORT}`);
+    console.log(`Omgeving: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Beschikbaar op: http://localhost:${PORT}`);
+  });
+}).catch((error) => {
+  console.error('Fout bij initialiseren van database:', error);
+  process.exit(1);
+});
 
 module.exports = app;

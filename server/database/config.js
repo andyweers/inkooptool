@@ -5,7 +5,7 @@ const path = require('path');
 const dbConfig = {
   // SQLite configuratie voor lokale ontwikkeling
   database: path.join(__dirname, '../data/orders.db'),
-  // PostgreSQL configuratie voor productie (Neon)
+  // PostgreSQL configuratie voor productie (Supabase)
   postgres: {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'postgres',
